@@ -5,15 +5,15 @@ namespace Instruction
 {
     using universal_id = unsigned long long;
     
-    enum Types;
+    // enum Types;
     struct Base;
     struct ADD;
 }
 
-enum Instruction::Types
-{
+// enum Instruction::Types
+// {
 
-};
+// };
 
 struct Instruction::Base
 {

@@ -7,4 +7,4 @@ public:
     Interpreter();
     void run(/*HighPerformanceRingBuffer, Execution Stack*/);
     void stop();
-}
+};

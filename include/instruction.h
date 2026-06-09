@@ -1,26 +1,42 @@
 #pragma once
-
+#include <cstdint>
+#include "fileReader.h"
 
 namespace Instruction
 {
-    using universal_id = unsigned long long;
+    // FIX -> return to integrate custom defined types
+    // enum class InstructionType
+    // {
+    //     BASE = 0,
+    //     ADD
+    // };
     
-    // enum Types;
     struct Base;
-    struct ADD;
+    struct Add;
 }
-
-// enum Instruction::Types
-// {
-
-// };
 
 struct Instruction::Base
 {
-    
+    std::uint32_t type;
+
+    Base();
+
+    Base(FileReader& fileReader)
+    {
+        type = fileReader.read();
+    }
 };
 
-struct Instruction::ADD : public Base
+struct Instruction::Add : public Instruction::Base
 {
+    std::uint32_t param1;
+    std::uint32_t param2;
 
+    Add(FileReader& fileReader)
+    {
+        //type = Instruction::InstructionType::ADD;
+        type = 1;
+        param1 = fileReader.read();
+        param2 = fileReader.read();
+    }
 };

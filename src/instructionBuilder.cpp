@@ -1,12 +1,7 @@
 #include "instructionBuilder.h"
 
-InstructionBuilder::InstructionBuilder()
+std::shared_ptr<Instruction::Base> InstructionBuilder::getInstruction()
 {
-
-}
-
-Instruction::ADD* AddBuilder::create()
-{
-    Instruction::ADD res;
-    return &res;
+    m_instructionBase.setFileReader(m_fileReader);
+    return m_instructionBase.build();
 }

@@ -2,16 +2,11 @@
 #include "instruction.h"
 #include <memory>
 
-void InstructionBase::setFileReader(FileReader& target)
-{            
-    m_fileReader = target;
-}
-
-// std::shared_ptr<Instruction::Base> InstructionBase::build()
+// std::shared_ptr<Instruction::Base> InstructionBase::build(FileReader& fileReader)
 // {
-//     Instruction::InstructionType type;
+//     Instruction::InstructionType type = fileReader.read();
 
-//     if (!(inputStream >> type)) return nullptr;
+//     if (!(type)) return nullptr;
 
 //     auto resInstructionType = resInstruction->type;
     

@@ -1,30 +1,21 @@
 #pragma once
 #include <cstdint>
 #include "fileReader.h"
+#include <iostream>
+#include <string>
 
 namespace Instruction
 {
-    // FIX -> return to integrate custom defined types
-    // enum class InstructionType
-    // {
-    //     BASE = 0,
-    //     ADD
-    // };
-    
+    using InstructionType = std::uint32_t;
     struct Base;
     struct Add;
 }
 
 struct Instruction::Base
 {
-    std::uint32_t type;
+    InstructionType type;
 
-    Base();
-
-    Base(FileReader& fileReader)
-    {
-        type = fileReader.read();
-    }
+    Base(InstructionType instructionType) : type (instructionType){};
 };
 
 struct Instruction::Add : public Instruction::Base
@@ -32,11 +23,17 @@ struct Instruction::Add : public Instruction::Base
     std::uint32_t param1;
     std::uint32_t param2;
 
-    Add(FileReader& fileReader)
+    Add(FileReader& fileReader, InstructionType t) : Base(t)
     {
-        //type = Instruction::InstructionType::ADD;
-        type = 1;
         param1 = fileReader.read();
         param2 = fileReader.read();
     }
+
+    Add(std::istream& inputStream, InstructionType t) : Base(t)
+    {
+        type = 1;
+        inputStream >> param1;
+        inputStream >> param2;
+    }
+
 };

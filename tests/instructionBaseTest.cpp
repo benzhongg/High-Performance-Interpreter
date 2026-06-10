@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "instructionBase.h"
 
-TEST(CreationTest, InstructionStructsSuccessfullyCreated)
+TEST(InstructionBaseCreationTest, StructsSuccessfullyCreated)
 {
     std::stringstream testStream("1 2 3");
     InstructionBase testInstructionBase;

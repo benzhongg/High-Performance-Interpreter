@@ -1,21 +1,21 @@
 #include "fileReader.h"
 
-FileReader::FileReader()
+void FileReader::start()
 {
-
+    m_isReading = true;
 }
-    
-void FileReader::run(/*Input File*/)
-{
 
-}
-    
 void FileReader::stop()
 {
-
+    m_isReading = false;
 }
 
-bool FileReader::isReading()
+std::uint32_t FileReader::read()
 {
-    return m_isReading;
+    std::uint32_t resultingByteCode = 0;
+    
+    m_iFstream >> resultingByteCode;
+
+    return resultingByteCode;
 }
+    

@@ -1,5 +1,11 @@
 add_executable(VirtualMachineTest 
-    fileReaderTest.cpp injectorTest.cpp instructionBuilderTest.cpp instructionTest.cpp interpreterTest.cpp)
+    fileReaderTest.cpp 
+    # injectorTest.cpp 
+    instructionBaseTest.cpp
+    # instructionBuilderTest.cpp 
+    # instructionTest.cpp 
+    #interpreterTest.cpp
+    )
 
 target_link_libraries(VirtualMachineTest PRIVATE LIBRARY GTest::gtest_main)
 

@@ -31,7 +31,6 @@ struct Instruction::Add : public Instruction::Base
 
     Add(std::istream& inputStream, InstructionType t) : Base(t)
     {
-        type = 1;
         inputStream >> param1;
         inputStream >> param2;
     }

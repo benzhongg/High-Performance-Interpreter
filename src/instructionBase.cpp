@@ -2,21 +2,38 @@
 #include "instruction.h"
 #include <memory>
 
-
 void InstructionBase::setFileReader(FileReader& target)
 {            
     m_fileReader = target;
 }
 
-std::shared_ptr<Instruction::Base> InstructionBase::build()
+// std::shared_ptr<Instruction::Base> InstructionBase::build()
+// {
+//     Instruction::InstructionType type;
+
+//     if (!(inputStream >> type)) return nullptr;
+
+//     auto resInstructionType = resInstruction->type;
+    
+//     if (resInstructionType == 1)
+//     {
+//         resInstruction = std::make_shared<Instruction::Add>(m_fileReader, type);
+//     }
+    
+//     return resInstruction;
+// }
+
+std::shared_ptr<Instruction::Base> InstructionBase::buildWithStream(std::istream& inputStream)
 {
-    auto resInstruction = std::make_shared<Instruction::Base>(m_fileReader);
-    auto resInstructionType = resInstruction->type;
+    Instruction::InstructionType type;
+
+    if (!(inputStream >> type)) return nullptr;
     
-    if (resInstructionType == 1)
+    switch(type)
     {
-        resInstruction = std::make_shared<Instruction::Add>(m_fileReader);
+        case 1:
+            return std::make_shared<Instruction::Add>(inputStream, type);
     }
-    
-    return resInstruction;
+
+    return nullptr;
 }

@@ -1,6 +1,5 @@
 #include "interpreter.h"
 
-
 Interpreter::Interpreter()
 {
 
@@ -15,6 +14,3 @@ void Interpreter::stop()
 {
     
 }
-
-
-

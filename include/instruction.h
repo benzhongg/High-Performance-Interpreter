@@ -19,17 +19,14 @@ namespace Instruction
         CMP,
         PRINT
     };
-    // this is a struct for base instruction 
+
     struct Base
     {
         InstructionType instructType;
 
         Base(InstructionType instructionType = UNKNOWN) : instructType (instructionType){};
 
-        void read(FileReaderBase* fileReader)
-        {
-            instructType = static_cast<InstructionType>(fileReader->get_uint32());
-        }
+        void read(FileReaderBase* fileReader);
     };
 
     struct Add : public Base
@@ -37,16 +34,9 @@ namespace Instruction
         std::uint32_t param1;
         std::uint32_t param2;
 
-        Add() : Base(InstructionType::ADD)
-        {
+        Add() : Base(InstructionType::ADD){};
         
-        }
-        
-        void read(FileReaderBase* fileReader)
-        {
-            param1 = fileReader->get_uint32();
-            param2 = fileReader->get_uint32();
-        }
+        void read(FileReaderBase* fileReader);
     };
 
 };

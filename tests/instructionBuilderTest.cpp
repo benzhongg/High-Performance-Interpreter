@@ -3,23 +3,24 @@
 
 TEST(InstructionBuilderCreationTest, StructsSuccessfullyCreated)
 {
-    char buffer[] = {0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 12);
+    char buffer[] = {0x01, 0x01, 0x02};
+    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 3);
+    
     InstructionBuilder testInstructionBuilder(testFileReaderBase);
     
-    auto resInstruction = testInstructionBuilder.get_instruction();
-    ASSERT_NE(resInstruction, nullptr);
-    ASSERT_EQ(resInstruction->instructType, Instruction::InstructionType::ADD);
+    auto resultInstruction = testInstructionBuilder.get_instruction();
+    
+    ASSERT_NE(resultInstruction, nullptr);
+    ASSERT_EQ(resultInstruction->instructType, Instruction::InstructionType::ADD);
 
-    switch (resInstruction->instructType)
+    switch (resultInstruction->instructType)
     {
         case Instruction::InstructionType::ADD :
         {
-            std::shared_ptr<Instruction::Add> addInstruction = std::static_pointer_cast<Instruction::Add>(resInstruction); 
+            std::shared_ptr<Instruction::Add> addInstruction = std::static_pointer_cast<Instruction::Add>(resultInstruction); 
             ASSERT_EQ(addInstruction->param1, 1);
             ASSERT_EQ(addInstruction->param2, 2);
-
-    break;
+            break;
         }
     }
 

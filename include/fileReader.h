@@ -6,8 +6,6 @@
 #include <cstring>
 #include <type_traits>
 
-// must be an abstract class
-// usually when a class name is Base it implies abstract
 class FileReaderBase
 {
 public:
@@ -20,28 +18,46 @@ public:
     virtual char*         get_bytes  (size_t size, bool* result = nullptr) = 0;
 };
 
-
-class FileReader
-{
-private:
-    std::ifstream m_iFstream;
-    bool m_isReading { false };
-
-public:
-    FileReader(const std::string& filePath) : m_iFstream(filePath){};
-    
-    void start();
-    void stop();
-    
-    std::uint32_t read();
-};
-
 class BufferFileReader : public FileReaderBase
 {
+
+private:
+    const char* m_data;
+    size_t m_size;
+    size_t m_pos;
+    
+    template <typename T>
+    T read_scalar(bool* result)
+    {
+        static_assert(std::is_integral_v<T>, "T must be an integral type");
+
+        if (!can_read(sizeof(T)))
+        {
+            set_result(result, false);
+            return T{};
+        }
+
+        T value{};
+        std::memcpy(&value, m_data + m_pos, sizeof(T));
+        m_pos += sizeof(T);
+
+        set_result(result, true);
+        return value;
+    }
+
+    bool can_read(size_t bytes) const
+    {
+        return m_pos + bytes <= m_size;
+    }
+
+    void set_result(bool* result, bool value)
+    {
+        if (result)
+        *result = value;
+    }
+
 public:
-    BufferFileReader(const char* data, size_t size)
-    : m_data(data), m_size(size), m_pos(0)
-    {}
+    BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {
@@ -103,42 +119,6 @@ public:
     {
         m_pos = 0;
     }
-
-private:
-    template <typename T>
-    T read_scalar(bool* result)
-    {
-        static_assert(std::is_integral_v<T>, "T must be an integral type");
-
-        if (!can_read(sizeof(T)))
-        {
-            set_result(result, false);
-            return T{};
-        }
-
-        T value{};
-        std::memcpy(&value, m_data + m_pos, sizeof(T));
-        m_pos += sizeof(T);
-
-        set_result(result, true);
-        return value;
-    }
-
-    bool can_read(size_t bytes) const
-    {
-        return m_pos + bytes <= m_size;
-    }
-
-    void set_result(bool* result, bool value)
-    {
-        if (result)
-        *result = value;
-    }
-
-private:
-    const char* m_data;
-    size_t m_size;
-    size_t m_pos;
 };
 
 

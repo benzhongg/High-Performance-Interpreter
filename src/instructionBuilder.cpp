@@ -2,7 +2,6 @@
 #include "instruction.h"
 #include <memory>
 
-
 std::shared_ptr<Instruction::Base> InstructionBuilder::get_instruction()
 {
     Instruction::Base baseInstruction;

@@ -3,8 +3,8 @@
 
 int main()
 {
-    char buffer[] = {0x01, 0x01, 0x02};
-    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 3);
+    char buffer[] = {0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 12);
     InstructionBuilder testInstructionBuilder(testFileReaderBase);
     
     auto resInstruction = testInstructionBuilder.get_instruction();

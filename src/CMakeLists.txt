@@ -3,7 +3,6 @@ set(SOURCES
     injector.cpp
     injector.cpp
     instruction.cpp
-    instructionBase.cpp
     instructionBuilder.cpp
     interpreter.cpp
 )

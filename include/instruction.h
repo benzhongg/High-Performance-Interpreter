@@ -6,33 +6,47 @@
 
 namespace Instruction
 {
-    using InstructionType = std::uint32_t;
-    struct Base;
-    struct Add;
-}
-
-struct Instruction::Base
-{
-    InstructionType type;
-
-    Base(InstructionType instructionType) : type (instructionType){};
-};
-
-struct Instruction::Add : public Instruction::Base
-{
-    std::uint32_t param1;
-    std::uint32_t param2;
-
-    Add(FileReader& fileReader, InstructionType t) : Base(t)
+    enum InstructionType
     {
-        param1 = fileReader.read();
-        param2 = fileReader.read();
-    }
-
-    Add(std::istream& inputStream, InstructionType t) : Base(t)
+        UNKNOWN = 0,
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        LOAD,
+        STORE,
+        JMP,
+        CMP,
+        PRINT
+    };
+    // this is a struct for base instruction 
+    struct Base
     {
-        inputStream >> param1;
-        inputStream >> param2;
-    }
+        InstructionType instructType;
+
+        Base(InstructionType instructionType = UNKNOWN) : instructType (instructionType){};
+
+        void read(FileReaderBase* fileReader)
+        {
+            instructType = static_cast<InstructionType>(fileReader->get_uint32());
+        }
+    };
+
+    struct Add : public Base
+    {
+        std::uint32_t param1;
+        std::uint32_t param2;
+
+        Add() : Base(InstructionType::ADD)
+        {
+        
+        }
+        
+        void read(FileReaderBase* fileReader)
+        {
+            param1 = fileReader->get_uint32();
+            param2 = fileReader->get_uint32();
+        }
+    };
 
 };

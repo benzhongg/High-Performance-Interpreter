@@ -1,16 +1,19 @@
 #pragma once
+#include "fileReader.h"
 #include "instruction.h"
 #include <memory>
-#include "instructionBase.h"
 
+//instruction builder 
 class InstructionBuilder
 {
-private:
-    // FIX -> No default values. is a reference is the correct place here
-    FileReader& m_fileReader;
-    InstructionBase m_instructionBase;
+
+private: 
+    FileReaderBase* m_fileReader = nullptr;
 
 public:
-    InstructionBuilder(FileReader& fileReader) : m_fileReader(fileReader){};
-    std::shared_ptr<Instruction::Base> getInstruction();
+    InstructionBuilder() = default;
+
+    InstructionBuilder(FileReaderBase* target) : m_fileReader(target) {};
+
+    std::shared_ptr<Instruction::Base> get_instruction();
 };

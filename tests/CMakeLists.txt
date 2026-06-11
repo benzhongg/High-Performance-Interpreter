@@ -1,8 +1,7 @@
 add_executable(VirtualMachineTest 
-    fileReaderTest.cpp 
+    #fileReaderTest.cpp 
     # injectorTest.cpp 
-    instructionBaseTest.cpp
-    # instructionBuilderTest.cpp 
+    instructionBuilderTest.cpp 
     # instructionTest.cpp 
     #interpreterTest.cpp
     )

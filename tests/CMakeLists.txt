@@ -6,7 +6,10 @@ add_executable(VirtualMachineTest
     #interpreterTest.cpp
     )
 
-target_link_libraries(VirtualMachineTest PRIVATE LIBRARY GTest::gtest_main)
+target_link_libraries(VirtualMachineTest PRIVATE 
+    LIBRARY 
+    GTest::gtest_main
+)
 
 include(GoogleTest)
 gtest_discover_tests(VirtualMachineTest)

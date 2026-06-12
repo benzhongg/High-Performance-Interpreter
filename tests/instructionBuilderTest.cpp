@@ -3,8 +3,8 @@
 
 TEST(InstructionBuilderCreationTest, StructsSuccessfullyCreated)
 {
-    char buffer[] = {0x01, 0x01, 0x02};
-    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 3);
+    char buffer[] = {0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
+    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 12);
     
     InstructionBuilder testInstructionBuilder(testFileReaderBase);
     
@@ -18,8 +18,8 @@ TEST(InstructionBuilderCreationTest, StructsSuccessfullyCreated)
         case Instruction::InstructionType::ADD :
         {
             std::shared_ptr<Instruction::Add> addInstruction = std::static_pointer_cast<Instruction::Add>(resultInstruction); 
-            ASSERT_EQ(addInstruction->param1, 1);
-            ASSERT_EQ(addInstruction->param2, 2);
+            ASSERT_EQ(addInstruction->param1, 2);
+            ASSERT_EQ(addInstruction->param2, 3);
             break;
         }
     }

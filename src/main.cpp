@@ -4,5 +4,5 @@
 
 int main()
 {
-    
+    RingBuffer<Instruction::Base, 1> testBuffer;
 }

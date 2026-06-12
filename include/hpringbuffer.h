@@ -8,7 +8,7 @@
 
 
 template<typename T, size_t CAPACITY>
-class HighPerformanceRingBuffer
+class RingBuffer
 {
 private:
     std::array<T, CAPACITY> m_buffer { default_value() };
@@ -41,9 +41,9 @@ public:
         return size() == 0;
     }
     
-    HighPerformanceRingBuffer() = default;
+    RingBuffer() = default;
     
-    ~HighPerformanceRingBuffer() = default;
+    ~RingBuffer() = default;
 
     bool push(T v)
     { 
@@ -72,21 +72,6 @@ public:
         }
     }
     
-    // bool pushRange(std::initializer_list<T> list)
-    // {
-    //     if (list.size() > (CAPACITY - size()))
-    //     {
-    //         return false;
-    //     }
-
-    //     for (auto item : list) 
-    //     {
-    //         push(item);
-    //     }
-
-    //     return true;
-    // }
-
     bool pop(T& out_value)
     {
         
@@ -105,28 +90,7 @@ public:
         return true;
     }
     
-    // std::list<T> popRange(int element_read_count)
-    // {
-    //     if (element_read_count > size() || element_read_count > CAPACITY)
-    //     {
-    //         return {};
-    //     } 
-    //     else 
-    //     {
-    //         std::list<T> res;
-
-    //         auto currentSize = size();
-            
-    //         for (auto x = 0; x < currentSize; x++)
-    //         {
-    //             res.push_back(pop());
-    //         }
-            
-    //         return res;
-    //     }
-    // }
-
-    //returns element count
+    
     size_t size() const
     {
 
@@ -142,11 +106,10 @@ public:
             return CAPACITY - temp_tail + temp_head;
         }
         
-        //H == T when empty, our FULL case won't occur -> see isFull()
         return 0;
     }
     
-    void clearBuffer()
+    void clear()
     {
         m_tail.store(0, std::memory_order_release);
         m_head.store(0, std::memory_order_release);

@@ -5,12 +5,15 @@ Interpreter::Interpreter()
 
 }
 
-void Interpreter::run()
+bool Interpreter::addInstruction(Instruction::Base inputInstruction)
 {
-
+    return m_ringBuffer->push(inputInstruction);
 }
 
-void Interpreter::stop()
+void Interpreter::run()
 {
-    
+    //grabs from ringbuffer
+    //executes instruction 
+    //and 
+    //pushes to stack 
 }

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "instructionBuilder.h"
-#include "hpringbuffer.h"
+#include "ringBuffer.h"
 
 int main()
 {

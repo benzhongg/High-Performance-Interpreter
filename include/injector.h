@@ -14,6 +14,7 @@ protected:
 
 public:
     Injector(FileReaderBase* fileReader, RingBuffer<std::shared_ptr<Instruction::Base>, 1024>* buffer);
+    
     virtual void run();
     virtual void stop();
 };

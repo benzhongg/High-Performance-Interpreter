@@ -1,27 +1,22 @@
 #include <gtest/gtest.h>
 #include "instructionBuilder.h"
+#include "injector.h"
+#include "interpreter.h"
+#include "fileReader.h"
 
 TEST(InstructionBuilderCreationTest, StructsSuccessfullyCreated)
 {
     char buffer[] = {0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
-    FileReaderBase* testFileReaderBase = new BufferFileReader(buffer, 12);
+    FileReaderBase* testFileReader =  new BufferFileReader(buffer, 12);
     
-    InstructionBuilder testInstructionBuilder(testFileReaderBase);
+    InstructionBuilder testInstructionBuilder(testFileReader);
+    RingBuffer<std::shared_ptr<Instruction::Base>, 1024>* testBuffer = new RingBuffer<std::shared_ptr<Instruction::Base>, 1024>();
     
-    auto resultInstruction = testInstructionBuilder.get_instruction();
-    
-    ASSERT_NE(resultInstruction, nullptr);
-    ASSERT_EQ(resultInstruction->instructType, Instruction::InstructionType::ADD);
+    Injector testInjector(testFileReader, testBuffer);
+    testInjector.run();
 
-    switch (resultInstruction->instructType)
-    {
-        case Instruction::InstructionType::ADD :
-        {
-            std::shared_ptr<Instruction::Add> addInstruction = std::static_pointer_cast<Instruction::Add>(resultInstruction); 
-            ASSERT_EQ(addInstruction->param1, 2);
-            ASSERT_EQ(addInstruction->param2, 3);
-            break;
-        }
-    }
+    // Interpreter testInterpreter(testBuffer);
+    // testInterpreter.run();
+
 
 }

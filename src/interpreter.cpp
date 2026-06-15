@@ -23,7 +23,7 @@ void Interpreter::run()
                 auto addInstruction = static_cast<Instruction::Add*>(instruction.get());
                 
                 m_resultStack.push(addInstruction->param1 + addInstruction->param2);
-                std::cout << "pushing to stack succeeded\n";
+                
             }
         }
     }

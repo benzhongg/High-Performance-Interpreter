@@ -5,6 +5,9 @@
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
+#include <filesystem>
+#include "stream_utils.h"
+#include <vector>
 
 class FileReaderBase
 {
@@ -22,10 +25,12 @@ class BufferFileReader : public FileReaderBase
 {
 
 private:
-    const char* m_data;
-    size_t m_size;
-    size_t m_pos;
-    
+    const char* m_data { nullptr };
+    size_t m_size { 0 };
+    size_t m_pos { 0 };
+    std::vector<char> m_byteContainer {};
+    std::unique_ptr<std::istream> m_iStream;
+
     template <typename T>
     T read_scalar(bool* result)
     {
@@ -57,7 +62,25 @@ private:
     }
 
 public:
+    // straightfoward works for char[] tests
     BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
+
+    // compatible with streams
+    BufferFileReader(std::unique_ptr<std::istream> targetStream) : m_iStream(std::move(targetStream))
+    {
+        if (!m_iStream || m_iStream->fail())
+        {
+            throw std::runtime_error("FileReader failed to open or read stream.");
+        }
+        
+        m_byteContainer.assign(std::istreambuf_iterator<char>(*m_iStream), std::istreambuf_iterator<char>());
+
+        m_size = m_byteContainer.size();
+        
+        if (!m_byteContainer.empty()) {
+            m_data = m_byteContainer.data(); 
+        } 
+    }
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <atomic>
 #include <thread>
+#include <memory>
 
 
 template<typename T, size_t CAPACITY>
@@ -72,7 +73,7 @@ public:
         }
     }
     
-    bool pop(T& out_value)
+    bool pop(std::shared_ptr<T>& out_value)
     {
         
         if (isEmpty())
@@ -82,7 +83,8 @@ public:
         
         auto temp_tail = m_tail.load(std::memory_order_acquire);
         
-        out_value = m_buffer[temp_tail];
+        out_value = std::make_shared<T>(m_buffer[temp_tail]);
+        
         temp_tail = (temp_tail + 1) % CAPACITY;
         
         m_tail.store(temp_tail, std::memory_order_release);

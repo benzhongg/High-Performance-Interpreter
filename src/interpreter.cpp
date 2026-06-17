@@ -1,42 +1,38 @@
 #include "interpreter.h"
-// CORRECTLY IDENTIFIED 
-// #2, #3, #4, #5, #8, #9
+Interpreter::Interpreter(std::shared_ptr<InstructionRingBuffer1024> targetRingBuffer) : m_ringBuffer(targetRingBuffer) {}
 
-
-// Issue #3 passing a ptr here is bad too should be a shared ptr since the buffer will also be used by injector
-// Issue #5 -> ringBuffer parameter never actually assigned to our m_ringBuffer
-Interpreter::Interpreter(InstructionRingBuffer1024* ringBuffer){}
-
-// 4 issues originall. Revised -> "There are 7 issues total" - Gemini.
 void Interpreter::run()
 {
-    m_running = true;
+    m_running.store(true, std::memory_order_release);
 
-    while (m_running)
+    while (m_running.load(std::memory_order_acquire))
     {
+        // Possible Issue 
+        // We're inputting base object ptrs and getting derived obj ptrs back 
         std::shared_ptr<Instruction::Base> instruction { nullptr };
 
-        // Issue #2 this while loop would deadlock if m_running wasn't included, calling stop() wouldn't get change so we need to condition on m_running
-        while(!m_ringBuffer->pop(instruction) && m_running)
+        while(!m_ringBuffer->pop(instruction) && m_running.load(std::memory_order_acquire))
         {
             std::this_thread::yield();
         }
         
-        // Issue #8
-        // if we stop() before we popped a value we're gonna access our instruction {nullptr} -> undefined behavior
+        if (!m_running.load(std::memory_order_acquire)) { break; }
+
         switch (instruction->instructType)
         {   
             case Instruction::InstructionType::ADD :
             {
-                // we are downcasting an existing smart ptr to a derived class static cast is compile time optimal
-                // Possibility-> read other casts
+                // Possible Issue
+                // we are downcasting an existing smart ptr to a derived class
+                // if this fails we have Undefined behavior
                 auto addInstruction = static_cast<Instruction::Add*>(instruction.get());
                 
                 m_resultStack.push(addInstruction->param1 + addInstruction->param2);
                 
-                //issue #4
-                // we need to end our cases or else we'll end up running through the next few cases
-                continue;
+                // choosing break over continue so that we can read the code better
+                // break leaves the switch statement -> 1 manual exit then let while loop end naturally
+                // continue leaves the current while loop iteration -> 2 manual exits 
+                break;
             }
         }
     }
@@ -44,6 +40,5 @@ void Interpreter::run()
 
 void Interpreter::stop()
 {
-    // Issue #9 we need to use synchronization tools here so that we don't have any concurrency issue between injectorThread and mainThread
-    m_running = false;
+    m_running.store(false, std::memory_order_release);
 }

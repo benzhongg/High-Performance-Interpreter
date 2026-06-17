@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <atomic>
 #include <thread>
+#include <memory>
 
 
 template<typename T, size_t CAPACITY>
@@ -12,16 +13,13 @@ class RingBuffer
 {
 private:
     std::array<T, CAPACITY> m_buffer { default_value() };
+    
+    std::atomic<int> m_head { 0 };
     // things to note
         // False Sharing -> if head and tail are atomics and placed next to each other in mem
         // They may end up on the same cache line, meaning either one of them might invalidate
             // the other for trying to read/update
             // this can be solved through "padding" like a char padding[64]
-            
-    //head is next write
-    std::atomic<int> m_head { 0 };
-    
-    //tail is next read
     std::atomic<int> m_tail { 0 };
 
 protected:
@@ -83,6 +81,7 @@ public:
         auto temp_tail = m_tail.load(std::memory_order_acquire);
         
         out_value = m_buffer[temp_tail];
+        
         temp_tail = (temp_tail + 1) % CAPACITY;
         
         m_tail.store(temp_tail, std::memory_order_release);

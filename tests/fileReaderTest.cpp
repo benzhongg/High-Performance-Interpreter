@@ -1,11 +1,44 @@
 #include <gtest/gtest.h>
 #include "fileReader.h"
 
-TEST(FileReaderInitializationTest, NoErrorThrownOnConstruction)
+TEST(TestStreamReader, ValidFilePath)
 {
-    FileReaderBase* testFileReader = new BufferFileReader(utils::makeFileStream("testData.txt"));
+    auto testStreamReader = StreamFileReader::create("testData.txt");
 
-    ASSERT_EQ(testFileReader->get_uint32(), 1);
-    ASSERT_EQ(testFileReader->get_uint32(), 2);
-    ASSERT_EQ(testFileReader->get_uint32(), 3);
+    ASSERT_TRUE(testStreamReader);
+}
+
+TEST(TestStreamReader, InvalidFilePath)
+{
+    auto testStreamReader = StreamFileReader::create("");
+    ASSERT_FALSE(testStreamReader);
+    ASSERT_EQ(testStreamReader.error(), ErrorCode::InvalidFormat);
+}
+
+TEST(TestStreamReader, ValidFileFormat)
+{
+    auto testStreamReader = StreamFileReader::create("testData.txt");
+    ASSERT_TRUE(testStreamReader);
+}
+
+TEST(TestStreamReader, InvalidFileFormat)
+{
+    auto testStreamReader = StreamFileReader::create("testData.html");
+    ASSERT_FALSE(testStreamReader);
+    ASSERT_EQ(testStreamReader.error(), ErrorCode::InvalidFormat);
+}
+
+TEST(TestStreamReader, EmptyFile)
+{
+
+}
+
+TEST(TestStreamReader, ValidCode)
+{
+
+}
+
+TEST(TestStreamReader, InvalidCode)
+{
+
 }

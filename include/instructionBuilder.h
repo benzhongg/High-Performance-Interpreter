@@ -7,7 +7,7 @@ class InstructionBuilder
 {
 
 private: 
-    FileReaderBase* m_fileReader = nullptr;
+    FileReaderBase* m_fileReader { nullptr };
 
 public:
     InstructionBuilder() = default;

@@ -9,12 +9,12 @@ class Interpreter
 private:
     std::atomic<bool> m_running { false };
 
-protected:
-    std::shared_ptr<InstructionRingBuffer1024> m_ringBuffer { nullptr };
+public:
+    InstructionRingBuffer1KPtr m_ringBuffer { nullptr };
     std::stack<std::uint32_t> m_resultStack { };
 
 public:
-    Interpreter(std::shared_ptr<InstructionRingBuffer1024> ringBuffer);
+    Interpreter(InstructionRingBuffer1KPtr ringBuffer);
     virtual void run();
     virtual void stop();
 };

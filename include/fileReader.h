@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <expected>
 #include "stream_utils.h"
+#include <stdexcept>
 
 
 enum ErrorCode
@@ -40,6 +41,17 @@ private:
         m_stream.open(path, std::ios::binary);
     }
     
+    template<typename T>
+    bool getBytes(T& value) {
+        // QUESTION -> WHY IS THIS ALLOWED?
+        if (m_stream.read(reinterpret_cast<char*>(&value), sizeof(T)))
+        {
+            return true;;
+        }
+
+        return false;
+    }
+
 public:
     
     static std::expected<StreamFileReader, ErrorCode> create(const std::filesystem::path& path)
@@ -60,7 +72,13 @@ public:
 
     std::uint32_t get_uint32 (bool* result = nullptr) override 
     {
-
+        std::uint32_t value;
+        bool success = getBytes<std::uint32_t>(value);
+        if (!success) 
+        {
+            throw std::runtime_error("Could not open file");
+        }
+        return value;
     }
 
     std::int32_t get_int32 (bool* result = nullptr) override
@@ -138,8 +156,6 @@ private:
 public:
     // straightfoward works for char[] tests
     BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
-
-    
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {

@@ -2,13 +2,21 @@
 #include <cstdint>
 #include <fstream>
 #include <memory>
+#include <vector>
 #include <cstddef>
 #include <cstring>
 #include <type_traits>
 #include <filesystem>
+#include <expected>
 #include "stream_utils.h"
-#include <vector>
+#include <stdexcept>
 
+
+enum ErrorCode
+{
+    NotFound,
+    InvalidFormat
+};
 class FileReaderBase
 {
 public:
@@ -21,6 +29,91 @@ public:
     virtual char*         get_bytes  (size_t size, bool* result = nullptr) = 0;
 };
 
+class StreamFileReader : public FileReaderBase 
+{
+private:
+    std::ifstream m_stream;
+    
+    
+    StreamFileReader(const std::filesystem::path& path)
+    {
+        // we put std::ios::binary for what reason?
+        m_stream.open(path, std::ios::binary);
+    }
+    
+    template<typename T>
+    bool getBytes(T& value) {
+        // QUESTION -> WHY IS THIS ALLOWED?
+        if (m_stream.read(reinterpret_cast<char*>(&value), sizeof(T)))
+        {
+            return true;;
+        }
+
+        return false;
+    }
+
+public:
+    
+    static std::expected<StreamFileReader, ErrorCode> create(const std::filesystem::path& path)
+    {
+        if (path.extension() != ".txt")
+        {
+            return std::unexpected(ErrorCode::InvalidFormat);
+        }
+
+        if (!std::filesystem::exists(path))
+        {
+            return std::unexpected(ErrorCode::NotFound);
+        }
+
+
+        return StreamFileReader(path);
+    }
+
+    std::uint32_t get_uint32 (bool* result = nullptr) override 
+    {
+        std::uint32_t value;
+        bool success = getBytes<std::uint32_t>(value);
+        if (!success) 
+        {
+            throw std::runtime_error("Could not open file");
+        }
+        return value;
+    }
+
+    std::int32_t get_int32 (bool* result = nullptr) override
+    {
+
+    }
+
+    std::uint64_t get_uint64 (bool* result = nullptr) override
+    {
+
+    }
+
+    std::int64_t get_int64 (bool* result = nullptr) override
+    {
+
+    }
+
+    std::uint8_t get_uint8 (bool* result = nullptr) override
+    {
+
+    }
+
+    std::int8_t get_int8 (bool* result = nullptr) override
+    {
+
+    }
+
+    char* get_bytes(size_t size, bool* result = nullptr) override
+    {
+
+    }
+};
+
+
+
 class BufferFileReader : public FileReaderBase
 {
 
@@ -29,7 +122,6 @@ private:
     size_t m_size { 0 };
     size_t m_pos { 0 };
     std::vector<char> m_byteContainer {};
-    std::unique_ptr<std::istream> m_iStream;
 
     template <typename T>
     T read_scalar(bool* result)
@@ -64,23 +156,6 @@ private:
 public:
     // straightfoward works for char[] tests
     BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
-
-    // compatible with streams
-    BufferFileReader(std::unique_ptr<std::istream> targetStream) : m_iStream(std::move(targetStream))
-    {
-        if (!m_iStream || m_iStream->fail())
-        {
-            throw std::runtime_error("FileReader failed to open or read stream.");
-        }
-        
-        m_byteContainer.assign(std::istreambuf_iterator<char>(*m_iStream), std::istreambuf_iterator<char>());
-
-        m_size = m_byteContainer.size();
-        
-        if (!m_byteContainer.empty()) {
-            m_data = m_byteContainer.data(); 
-        } 
-    }
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {

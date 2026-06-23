@@ -1,6 +1,11 @@
 #include "interpreter.h"
 Interpreter::Interpreter(InstructionRingBuffer1KPtr targetRingBuffer) : m_ringBuffer(targetRingBuffer) {}
 
+void Interpreter::runAsync()
+{
+    m_thread = std::thread(&Interpreter::run, this);
+}
+
 void Interpreter::run()
 {
     m_running.store(true, std::memory_order_release);

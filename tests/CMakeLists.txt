@@ -1,15 +1,18 @@
 add_executable(VirtualMachineTest 
-    fileReaderTest.cpp 
+    # fileReaderTest.cpp 
     # injectorTest.cpp 
     # instructionBuilderTest.cpp
-    # mainTest.cpp 
     # instructionTest.cpp 
-    #interpreterTest.cpp
+    interpreterTest.cpp
 )
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/testData.txt"
     "${CMAKE_CURRENT_BINARY_DIR}/testData.txt"
+    "${CMAKE_CURRENT_BINARY_DIR}/testData.html"
+    "${CMAKE_CURRENT_SOURCE_DIR}/testData.html"
+    "${CMAKE_CURRENT_SOURCE_DIR}/testEmptyData.txt"
+    "${CMAKE_CURRENT_BINARY_DIR}/testEmptyData.txt"
     COPYONLY
 )
 

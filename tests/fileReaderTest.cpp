@@ -34,9 +34,9 @@ TEST(TestStreamReader, EmptyFile)
     auto testStreamReader = StreamFileReader::create("testEmptyData.txt");
     if (testStreamReader)
     {
-        auto testStreamReaderPtr = std::make_shared<StreamFileReader>(std::move(*testStreamReader));
-        InstructionBuilder testInstructionBuilder = InstructionBuilder(testStreamReaderPtr);
-        ASSERT_THROW(testInstructionBuilder.get_instruction(), std::runtime_error);
+        auto testStreamReaderPtr = std::make_unique<StreamFileReader>(std::move(*testStreamReader));
+        InstructionBuilder* testInstructionBuilder = new InstructionBuilder(testStreamReaderPtr.get());
+        ASSERT_THROW(testInstructionBuilder->get_instruction(), std::runtime_error);
     } 
 }
 
@@ -45,9 +45,9 @@ TEST(TestStreamReader, ValidBinaryDataPassing)
     auto testStreamReader = StreamFileReader::create("testData.txt");
     if (testStreamReader)
     {
-        auto testStreamReaderPtr = std::make_shared<StreamFileReader>(std::move(*testStreamReader));
-        InstructionBuilder testInstructionBuilder = InstructionBuilder(testStreamReaderPtr);
-        auto res = testInstructionBuilder.get_instruction();
+        auto testStreamReaderPtr = std::make_unique<StreamFileReader>(std::move(*testStreamReader));
+        InstructionBuilder* testInstructionBuilder = new InstructionBuilder(testStreamReaderPtr.get());
+        auto res = testInstructionBuilder->get_instruction();
         ASSERT_EQ(res->instructType, Instruction::InstructionType::ADD);
     }
 }

@@ -8,7 +8,6 @@
 #include <type_traits>
 #include <filesystem>
 #include <expected>
-#include "stream_utils.h"
 #include <stdexcept>
 
 
@@ -54,6 +53,18 @@ private:
         return false;
     }
 
+    template<typename T>
+    T returnValue()
+    {
+        T value;
+        auto success = getBytes<T>(value);
+        if (!success)
+        {
+            throw std::runtime_error("Could not open file");
+        }
+        return value;
+    }
+
 public:
     
     static std::expected<StreamFileReader, ErrorCode> create(const std::filesystem::path& path)
@@ -74,38 +85,32 @@ public:
 
     std::uint32_t get_uint32 (bool* result = nullptr) override 
     {
-        std::uint32_t value;
-        bool success = getBytes<std::uint32_t>(value);
-        if (!success) 
-        {
-            throw std::runtime_error("Could not open file");
-        }
-        return value;
+        return returnValue<std::uint32_t>();
     }
 
     std::int32_t get_int32 (bool* result = nullptr) override
     {
-
+        return returnValue<std::int32_t>();
     }
 
     std::uint64_t get_uint64 (bool* result = nullptr) override
     {
-
+        return returnValue<std::uint64_t>();
     }
 
     std::int64_t get_int64 (bool* result = nullptr) override
     {
-
+        return returnValue<std::int64_t>();
     }
 
     std::uint8_t get_uint8 (bool* result = nullptr) override
     {
-
+        return returnValue<std::uint8_t>();
     }
 
     std::int8_t get_int8 (bool* result = nullptr) override
     {
-
+        return returnValue<std::int8_t>();
     }
 
     char* get_bytes(size_t size, bool* result = nullptr) override

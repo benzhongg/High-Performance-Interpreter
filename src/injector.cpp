@@ -1,18 +1,26 @@
 #include "injector.h"
 
-Injector::Injector(FileReaderBase* fileReader, RingBuffer<std::shared_ptr<Instruction::Base>, 1024>* buffer)
-: m_fileReader(fileReader), m_ringBuffer(buffer)
+Injector::Injector(std::shared_ptr<FileReaderBase> fileReader, InstructionRingBuffer1KPtr buffer) : m_fileReader(fileReader), m_ringBuffer(buffer)
 {
-    m_instructBuilder = new InstructionBuilder(fileReader);
+    m_instructBuilder = std::make_unique<InstructionBuilder>(InstructionBuilder(fileReader));
+}
+
+void Injector::runAsync()
+{
+    m_thread = std::thread(&Injector::run, this);
 }
 
 void Injector::run()
 {
-    while (true)
+    m_running = true;
+    
+    while (m_running)
     {
         auto resInstruction = m_instructBuilder->get_instruction();
-        
-        while(!m_ringBuffer->push(resInstruction))
+
+        if (!resInstruction) { continue; }
+
+        while(!m_ringBuffer->push(resInstruction) && m_running)
         {
             std::this_thread::yield();
         }
@@ -21,5 +29,6 @@ void Injector::run()
 
 void Injector::stop()
 {
-    // TODO: on your as exercise
+    m_running = false;
+    m_thread.join(); 
 }

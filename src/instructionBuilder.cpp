@@ -4,67 +4,60 @@
 
 std::shared_ptr<Instruction::Base> InstructionBuilder::get_instruction()
 {
-    Instruction::Base baseInstruction;
-    baseInstruction.read(m_fileReader);
+    auto baseInstruction = std::make_shared<Instruction::Base>();
+    baseInstruction->read(m_fileReader);
     
-    switch(baseInstruction.instructType)
+    switch(baseInstruction->instructType)
     {
         case Instruction::ADD :
         {
-            auto baseInstruction = std::make_shared<Instruction::Add>();
-            baseInstruction->read(m_fileReader);
-            
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Add>();
+            break;
         }
         
         case Instruction::SUB :
         {
-            auto baseInstruction = std::make_shared<Instruction::Sub>();
-            baseInstruction->read(m_fileReader);
-
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Sub>();
+            break;
         }
         
         case Instruction::MUL :
         {
-            auto baseInstruction = std::make_shared<Instruction::Mul>();
-            baseInstruction->read(m_fileReader);
-
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Mul>();
+            break;
         }
         
         case Instruction::DIV :
         {
-            auto baseInstruction = std::make_shared<Instruction::Div>();
-            baseInstruction->read(m_fileReader);
-
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Div>();
+            break;
         }
         
         case Instruction::STORE :
         {
-            auto baseInstruction = std::make_shared<Instruction::Store>();
-            baseInstruction->read(m_fileReader);
-
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Store>();
+            break;
         }
         
         case Instruction::CMP :
         {
-            auto baseInstruction = std::make_shared<Instruction::Compare>();
-            baseInstruction->read(m_fileReader);
-
-            return baseInstruction;
+            baseInstruction = std::make_shared<Instruction::Compare>();
+            break;
         }
         
         case Instruction::PRINT :
         {
-            auto printInstruction = std::make_shared<Instruction::Print>();
-            printInstruction->read(m_fileReader);
+            baseInstruction = std::make_shared<Instruction::Print>();
+            break;
+        }
 
-            return printInstruction;
+        default :
+        {
+            return nullptr;
         }
     }
     
-    return nullptr;
+    baseInstruction->read(m_fileReader);
+
+    return baseInstruction;
 }

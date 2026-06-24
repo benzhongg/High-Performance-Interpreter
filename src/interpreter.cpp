@@ -101,6 +101,7 @@ void Interpreter::run()
             case Instruction::InstructionType::PRINT :
             {
                 auto printInstruction = static_cast<Instruction::Print*>(instruction.get());
+                // BUG -> our thread output isn't captured in main
                 std::cout << printInstruction->printStr << std::endl;
                 break;
             }

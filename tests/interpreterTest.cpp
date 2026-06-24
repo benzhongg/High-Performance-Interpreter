@@ -48,7 +48,7 @@ public:
     }
 };
 
-TEST(AddInstructionTest, withCharBuffer)
+TEST(AddInterpreterTest, withCharBuffer)
 {
     const char bufferContainingAdd[] = {0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingAdd, 12);
@@ -56,7 +56,7 @@ TEST(AddInstructionTest, withCharBuffer)
     ASSERT_EQ(testInstance.resultCheck(5), true);
 }
 
-TEST(SubInstructionTest, withCharBuffer)
+TEST(SubInterpreterTest, withCharBuffer)
 {
     char bufferContainingSub[] = {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingSub, 12);
@@ -64,7 +64,7 @@ TEST(SubInstructionTest, withCharBuffer)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(MulInstructionTest, withCharBuffer)
+TEST(MulInterpreterTest, withCharBuffer)
 {
     char bufferContainingMul[] = {0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingMul, 12);
@@ -72,7 +72,7 @@ TEST(MulInstructionTest, withCharBuffer)
     ASSERT_EQ(testInstance.resultCheck(6), true);
 }
 
-TEST(DivInstructionTest, withCharBuffer)
+TEST(DivInterpreterTest, withCharBuffer)
 {
     char bufferContainingDiv[] = {0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingDiv, 12);
@@ -80,7 +80,7 @@ TEST(DivInstructionTest, withCharBuffer)
     ASSERT_EQ(testInstance.resultCheck(2), true);
 }
 
-TEST(StoreInstructionTest, withCharBuffer)
+TEST(StoreInterpreterTest, withCharBuffer)
 {
     char bufferContainingStore[] = {0x05, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingStore, 8);
@@ -88,7 +88,7 @@ TEST(StoreInstructionTest, withCharBuffer)
     ASSERT_EQ(testInstance.resultCheck(5), true);
 }
 
-TEST(GTCompareInstructionTest, withCharBufferTrueOutput)
+TEST(GTCompareInterpreterTest, withCharBufferTrueOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -96,7 +96,7 @@ TEST(GTCompareInstructionTest, withCharBufferTrueOutput)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(GTCompareInstructionTest, withCharBufferFalseOutput)
+TEST(GTCompareInterpreterTest, withCharBufferFalseOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -104,7 +104,7 @@ TEST(GTCompareInstructionTest, withCharBufferFalseOutput)
     ASSERT_EQ(testInstance.resultCheck(0), true);
 }
 
-TEST(LTCompareInstructionTest, withCharBufferTrueOutput)
+TEST(LTCompareInterpreterTest, withCharBufferTrueOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -112,7 +112,7 @@ TEST(LTCompareInstructionTest, withCharBufferTrueOutput)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(LTCompareInstanceTest, withCharBufferFalseOutput)
+TEST(LTCompareInterpreterTest, withCharBufferFalseOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -120,8 +120,7 @@ TEST(LTCompareInstanceTest, withCharBufferFalseOutput)
     ASSERT_EQ(testInstance.resultCheck(0), true);
 }
 
-//GTE TRUE + FALSE
-TEST(GTECompareInstructionTest, withCharBufferTrueOutput)
+TEST(GTECompareInterpreterTest, withCharBufferTrueOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -129,7 +128,7 @@ TEST(GTECompareInstructionTest, withCharBufferTrueOutput)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(GTECompareInstructionTest, withCharBufferFalseOutput)
+TEST(GTECompareInterpreterTest, withCharBufferFalseOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -137,8 +136,7 @@ TEST(GTECompareInstructionTest, withCharBufferFalseOutput)
     ASSERT_EQ(testInstance.resultCheck(0), true);
 }
 
-//LTE TRUE + FALSE
-TEST(LTECompareInstructionTest, withCharBufferTrueOutput)
+TEST(LTECompareInterpreterTest, withCharBufferTrueOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -146,7 +144,7 @@ TEST(LTECompareInstructionTest, withCharBufferTrueOutput)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(LTECompareInstructionTest, withCharBufferFalseOutput)
+TEST(LTECompareInterpreterTest, withCharBufferFalseOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -154,8 +152,7 @@ TEST(LTECompareInstructionTest, withCharBufferFalseOutput)
     ASSERT_EQ(testInstance.resultCheck(0), true);
 }
 
-//EQ TRUE + FALSE
-TEST(EQCompareInstructionTest, withCharBufferTrueOutput)
+TEST(EQCompareInterpreterTest, withCharBufferTrueOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
@@ -163,10 +160,18 @@ TEST(EQCompareInstructionTest, withCharBufferTrueOutput)
     ASSERT_EQ(testInstance.resultCheck(1), true);
 }
 
-TEST(EQCompareInstructionTest, withCharBufferFalseOutput)
+TEST(EQCompareInterpreterTest, withCharBufferFalseOutput)
 {
     char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
     MockVM testInstance(bufferContainingCompare, 16);
     testInstance.run();
     ASSERT_EQ(testInstance.resultCheck(0), true);
+}
+
+TEST(PrintInterpreterTest, withCharBuffer)
+{
+    char bufferContainingPrint[] = {0x07, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x68, 0x65, 0x6C, 0x6F, 0x77, 0x6F, 0x72, 0x6C, 0x64};
+    MockVM testInstance(bufferContainingPrint, 18);
+    testInstance.run();
+    SUCCEED();
 }

@@ -1,0 +1,175 @@
+5/29/2026
+Class Design talks about what objects we need and their responsiblities
+
+Objects:
+    - one injector 
+    - one interpreter 
+    - one file reader
+    - one instruction builder manager
+    - several instruction builders
+    - one buffer
+    - one execution stack
+
+========
+Injector
+======== 
+    What is it?
+        - Class Injector
+            - public method (class interface what functions are we providing outside) 
+                - run(file name, ring buffer)
+                    - run will read 1 by 1 and fill instr to ring buffer
+                        ** Do not confuse send with send_message, use another name**
+                - stop()
+        - Runs on the main thread
+
+    What does it interact with?
+        - file reader
+        - buffer
+
+    TESTS:
+        - INPUT -> OUTPUT INTO BUFFER
+        - SEND TO FILE READER -> FILE READER REPLIES WITH INSTRUCTIONS DECODED
+
+===========
+Interpreter
+===========
+    What is it?
+        - Class Interpreter
+            - public interface 
+                - run(ring buffer)
+                - stop()
+        
+        - runs on a separate thread
+
+    What does it interact with?
+        - buffer
+        - execution stack
+    
+    TESTS: 
+        - BUFFER OUTPUT -> CORRECT EXECUTION STACK RESULT
+        - ADD 1 , 2 -> 3  
+
+
+==========
+FileReader
+==========
+    What is it?
+        - Class FileReader
+            - public interface
+                - read()
+                - setFile(File name)
+
+    What does it interact with?
+        - injector
+        - byte code file 
+        - instructionBase
+
+    What is the file reader's responsiblity?
+        - it's handed the single file and reads it
+
+    TESTS: 
+        - FILE INPUT -> DECODED INSTRUCTION OUTPUT INTO INJECTOR
+        - READ EMPTY FILE -> NOTHING TO PASS
+        - HANDLE ADD INSTRUCTION -> 3 values should be returned 
+    
+===========
+Instruction
+===========
+What is it?
+    - Structs or Classes? -> Plain old data so we'll use structs 
+    - Structs for each instruction 
+    - Each instruction should have their own set # of operands needed
+    - See the list of the kinds of instructions @ the ArchitectureDesign.txt
+    - With a set length of 32bits
+
+What does it interact with? 
+    - Lifecycle of an instruction struct
+    START: File Reader initiates Instruct Builder to create new struct
+           Instruction Builder sends to Injector
+           Injector loads to Buffer
+    END:   Interpreter executes instruction
+
+What are it's responsiblities?
+    - POD -- holding Operator and Operands
+
+TESTS:
+    ADD 1, 1 -> struct contains 
+                        1. type identifier for ADD
+                        2. 1 , 1 -> operands for ADD
+
+
+SUB - subtracts two elements
+    - 2 operands
+    - uint32_t 
+    -
+MUL - multiplies two elements
+    - 2 operands
+    - uint32_t 
+
+DIV - divides two elements
+    - 2 operands type uint32_t 
+
+LOAD - Loading an element from a memory (address?)
+    - 1 operands type uint32_t 
+
+STORE - Storing an element onto the stack
+    - 1 operand type uint32_t 
+
+JMP - jump to an addr?
+    - 1 operands type uint32_t 
+
+CMP - compare two elements
+    - 2 operands type uint32_t 
+
+PRINT 
+
+
+
+===================
+INSTRUCTION BUILDER
+===================
+What is it?
+
+    - Class InstructionBuilder
+    - public interface
+        - GetInstruction()
+
+
+
+What does it interact with?
+    - Receives FileReader | IB dependent on FR
+    - Delivers to Injector
+
+What are its responsiblities?
+    Build accurate instructions 
+    It also provides instruction simplifications -> optimizations.
+    Examples:
+        ADD 1, 1 -> STORE (2)
+        ADD 1, 0 -> Store (2)
+
+TESTS:
+    ADD 1, 1 -> Send to Injector as fully constructed instruction struct  
+
+=====================
+BUILDER X INSTRUCTION
+=====================
+What is it?
+    - a builder subclass dedicated to constructing one instruction type
+    - Class BuilderX : Class BaseInstruct
+        - create()
+        - optimize()?
+    
+What does it interact with?
+    - Receives and Returns InstructionBuilder
+
+What are its responbilities?
+    - Construct and return Instruction Struct to InstructionBuilder
+
+TESTS:
+    Input parameter of [ADD 1, 1] -> Returns [STORE 2]
+
+1. Complete interpreter class and fix issues -> tests multiple
+2. FileReader Tests -> multiple
+3. complete instructions
+4. check test cases for ringbuffer
+5. add doc to remote branch

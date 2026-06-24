@@ -1,0 +1,87 @@
+5/29/2026
+Stage 1
+Architectural Design:
+    - designing architecture
+    - defining anything we need
+    - anything it interacts with
+
+=================
+Problem Statement 
+=================
+Interpreters work by compiling to bytecode, and then a VM interprets that bytecode.
+But our files are unusually large, so we'll need to find a way to shorten it. 
+
+Limitations: 
+The interpreter buffer is limited in size
+
+========
+Solution
+========
+We'll introduce an injector that speeds up our interpreter by precomputing values inbetween the file and instruction execution.
+Injector to read instructions from file (memory) and inject to the interpreter buffer.
+
+Highest Level overview 
+    Our program will read a bytecode file and be able to execute a program.
+
+===================
+Instructions Needed
+===================
+ADD,
+SUB,
+MUL,
+DIV,
+LOAD,
+STORE,
+JMP,
+CMP,
+PRINT
+
+==========
+Input File
+==========
+What is it?
+    - bytecode
+
+=============
+Module Design
+=============
+FETCH -> DECODE -> EXECUTE
+one injector, one file reader , one interpreter
+
+
+What is injector? 
+    - the injector will be a first point of contact and facilitator
+    - injector reads from file
+    - works on main thread no other use for main thread, so we'll stay here
+
+What is the file reader?
+    - reads files bytecodes
+    - decodes instructions 
+
+What is interpreter?
+    - Executes instructions
+    - Send results to execution stack  
+    - Example:
+        Given Instr - ADD parameters -> number1 number2
+    - One memory store named Stack to store params, results, mem
+        Consider making the memory a Stack structure with load and store
+            - What type is the stack?
+                - (important because we define our limitation) pick 32 bit type stack   limited 2^32-1
+                - each parameter is a 32 bit result into our stack
+    - interpreter is a different dedicated thread
+
+==============
+PROGRAM DESIGN
+==============
+
+Where do the modules occur?
+Injector can be on the main thread -> nothing is going on in the main thread 
+Interpreter is a separate thread
+File Reader is a separate thread
+
+
+=====
+NOTES
+=====
+
+Single responsibility suggests we should not let the file reader decode and compute instructions, we'll separate them and let the interpreter execute instructions

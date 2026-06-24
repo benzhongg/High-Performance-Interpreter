@@ -20,6 +20,8 @@ enum ErrorCode
 class FileReaderBase
 {
 public:
+    FileReaderBase() = default;
+
     virtual std::uint32_t get_uint32 (bool* result = nullptr) = 0;
     virtual std::int32_t  get_int32  (bool* result = nullptr) = 0;
     virtual std::uint64_t get_uint64 (bool* result = nullptr) = 0;
@@ -42,7 +44,7 @@ private:
     }
     
     template<typename T>
-    bool getBytes(T& value) {
+    bool getBytes(T& value, size_t length = 0) {
         // QUESTION -> WHY IS THIS ALLOWED?
         if (m_stream.read(reinterpret_cast<char*>(&value), sizeof(T)))
         {
@@ -108,7 +110,11 @@ public:
 
     char* get_bytes(size_t size, bool* result = nullptr) override
     {
+        char* res = new char[size];
+        
+        m_stream.read(res, size);
 
+        return res;
     }
 };
 
@@ -154,8 +160,7 @@ private:
     }
 
 public:
-    // straightfoward works for char[] tests
-    BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
+    BufferFileReader(const char* data, size_t size) : FileReaderBase(), m_data(data), m_size(size), m_pos(0){}
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {

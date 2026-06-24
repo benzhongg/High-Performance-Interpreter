@@ -85,13 +85,13 @@ void Interpreter::run()
                     
                     case Instruction::Compare::CompareOperand::GreaterEqual :
                     {
-                        m_resultStack.push(compareInstruction->param1 <= compareInstruction->param2);
+                        m_resultStack.push(compareInstruction->param1 >= compareInstruction->param2);
                         break;
                     }
                     
                     case Instruction::Compare::CompareOperand::LessEqual :
                     {
-                        m_resultStack.push(compareInstruction->param1 < compareInstruction->param2);
+                        m_resultStack.push(compareInstruction->param1 <= compareInstruction->param2);
                         break;
                     }
                 }
@@ -116,4 +116,5 @@ void Interpreter::run()
 void Interpreter::stop()
 {
     m_running.store(false, std::memory_order_release);
+    m_thread.join();
 }

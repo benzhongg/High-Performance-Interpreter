@@ -4,176 +4,123 @@
 #include "ringBuffer.h"
 #include "injector.h"
 #include "global.h"
-//create macro
-    //clutter
-    //hard to debug cannot be stepped into -> debugging the binary file 
-//create static function 
-    // runSetup(buffer[])
-//create mock class
-    // class::create(buffer[])
 class MockVM
 {
 private:
+    class MockInterpreter : public Interpreter
+    {
+    public:
+        MockInterpreter(InstructionRingBuffer1KPtr ringBufferPtrInput) : Interpreter(ringBufferPtrInput){};
 
-    BufferFileReader m_testBufferFileReader;
-    InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
+        bool verifyStack(std::uint32_t testValue)
+        {
+            return m_resultStack.top() == testValue;
+        }
+    };
 
-    
+    std::shared_ptr<FileReaderBase> m_fileReader { nullptr };
+    InstructionRingBuffer1KPtr m_ringBufferPtr = std::make_shared<InstructionRingBuffer1024>();
+    Injector m_injector = Injector(m_fileReader, m_ringBufferPtr);
+    MockInterpreter m_interpreter = MockInterpreter(m_ringBufferPtr);
+
 
 public:
-    MockVM(char* buffer, size_t size)
+    MockVM(const char* buffer, size_t size)
     {
-        m_testBufferFileReader = BufferFileReader(buffer, size);
+        m_fileReader = std::make_shared<BufferFileReader>(buffer, size);
+        m_injector = Injector(m_fileReader, m_ringBufferPtr);
     }
     
-    
-    bool evaluateStack(std::uint32_t expectedValue)
+    void run()
     {
-        return m_resultStack.top() == expectedValue;
+        m_injector.runAsync();
+        m_interpreter.runAsync();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        m_injector.stop();
+        m_interpreter.stop();
+    }
+    
+    bool resultCheck(std::uint32_t expectedValue)
+    {
+        return m_interpreter.verifyStack(expectedValue);
     }
 };
 
-// change definition of the mockclass
-TEST(AddInstructionTest, ExecutingAddFromBuffer)
+TEST(AddInstructionTest, withCharBuffer)
 {
-    char bufferWithAddInstruction[] = {0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
-    MockVM testMVM(buffer, size);
-    testMVM.run();
-    ASSERT_EQ(testInterpreter.evaluateStack(5), true);
+    const char bufferContainingAdd[] = {0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingAdd, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(5), true);
 }
 
-// TEST(SubInstructionTest, ExecutingSubFromBuffer)
-// {
-//     char bufferWithSubInstruction[] = {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-    
-//     FileReaderBase* testBufferFileReaderPtr = new BufferFileReader(bufferWithSubInstruction, 12);
-//     InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
+TEST(SubInstructionTest, withCharBuffer)
+{
+    char bufferContainingSub[] = {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingSub, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(1), true);
+}
 
-//     Injector testInjector(testBufferFileReaderPtr, testRingBufferPtr);
-//     Interpreter testInterpreter(testRingBufferPtr);
+TEST(MulInstructionTest, withCharBuffer)
+{
+    char bufferContainingMul[] = {0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingMul, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(6), true);
+}
 
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
+TEST(DivInstructionTest, withCharBuffer)
+{
+    char bufferContainingDiv[] = {0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingDiv, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(2), true);
+}
 
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+TEST(StoreInstructionTest, withCharBuffer)
+{
+    char bufferContainingStore[] = {0x05, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingStore, 8);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(5), true);
+}
 
-//     testInjector.stop();
-//     testInterpreter.stop();
+TEST(GTCompareInstructionTest, withCharBufferTrueOutput)
+{
+    char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingCompare, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(1), true);
+}
 
-//     threadInjector.join();
-//     threadInterpreter.join();
-//     ASSERT_EQ(testInterpreter.m_resultStack.top(), 1);
-// }
+TEST(GTCompareInstructionTest, withCharBufferFalseOutput)
+{
+    char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingCompare, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(0), true);
+}
 
-// TEST(MulInstructionTest, ExecutingMulFromBuffer)
-// {
-//     char bufferWithSubInstruction[] = {0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-    
-//     FileReaderBase* testBufferFileReaderPtr = new BufferFileReader(bufferWithSubInstruction, 12);
-//     InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
+TEST(LTCompareInstructionTest, withCharBufferTrueOutput)
+{
+    char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingCompare, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(1), true);
+}
 
-//     Injector testInjector(testBufferFileReaderPtr, testRingBufferPtr);
-//     Interpreter testInterpreter(testRingBufferPtr);
+TEST(LTCompareInstanceTest, withCharBufferFalseOutput)
+{
+    char bufferContainingCompare[] = {0x06, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00};
+    MockVM testInstance(bufferContainingCompare, 12);
+    testInstance.run();
+    ASSERT_EQ(testInstance.resultCheck(0), true);
+}
 
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
+//GTE TRUE + FALSE
+//LTE TRUE + FALSE
 
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-//     testInjector.stop();
-//     testInterpreter.stop();
-
-//     threadInjector.join();
-//     threadInterpreter.join();
-//     ASSERT_EQ(testInterpreter.m_resultStack.top(), 6);
-// }
-
-// TEST(DivInstructionTest, ExecutingDivFromBuffer)
-// {
-//     char bufferWithDivInstruction[] = {0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-    
-//     FileReaderBase* testBufferFileReaderPtr = new BufferFileReader(bufferWithDivInstruction, 12);
-//     InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
-
-//     Injector testInjector(testBufferFileReaderPtr, testRingBufferPtr);
-//     Interpreter testInterpreter(testRingBufferPtr);
-
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
-
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-//     testInjector.stop();
-//     testInterpreter.stop();
-
-//     threadInjector.join();
-//     threadInterpreter.join();
-//     ASSERT_EQ(testInterpreter.m_resultStack.top(), 2);
-// }
-
-// TEST(StoreInstructionTest, ExecutingStoreFromBuffer)
-// {
-//     char bufferWithStoreInstruction[] = {0x05, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00};
-    
-//     FileReaderBase* testBufferFileReaderPtr = new BufferFileReader(bufferWithStoreInstruction, 8);
-//     InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
-
-//     Injector testInjector(testBufferFileReaderPtr, testRingBufferPtr);
-//     Interpreter testInterpreter(testRingBufferPtr);
-
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
-
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-//     testInjector.stop();
-//     testInterpreter.stop();
-
-//     threadInjector.join();
-//     threadInterpreter.join();
-//     ASSERT_EQ(testInterpreter.m_resultStack.top(), 5);
-// }
-
-// TEST(CompareInstructionTest, ExecutingCompareFromBuffer)
-// {
-//     char bufferWithCompareInstruction[] = {0x06, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-    
-//     FileReaderBase* testBufferFileReaderPtr = new BufferFileReader(bufferWithCompareInstruction, 12);
-//     InstructionRingBuffer1KPtr testRingBufferPtr = std::make_shared<InstructionRingBuffer1024>();
-
-//     Injector testInjector(testBufferFileReaderPtr, testRingBufferPtr);
-//     Interpreter testInterpreter(testRingBufferPtr);
-
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
-
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-//     testInjector.stop();
-//     testInterpreter.stop();
-
-//     threadInjector.join();
-//     threadInterpreter.join();
-//     ASSERT_EQ(testInterpreter.m_resultStack.top(), 1);
-// }
-
-// TEST(PrintInstructionTest, ExecutingPrintFromBuffer)
-// {
-//     char bufferWithPrintInstruction[] = {0x09, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 'h', 'e', 'l', 'l', 'o','w','o','r','l','d'};
-//     FileReaderBase* testFileReader = new BufferFileReader(bufferWithPrintInstruction, 18);
-//     InstructionRingBuffer1KPtr testRingBuffer = std::make_shared<InstructionRingBuffer1024>();
-
-//     Injector testInjector(testFileReader, testRingBuffer);
-//     Interpreter testInterpreter(testRingBuffer);
-    
-//     std::thread threadInjector(&Injector::run, &testInjector);
-//     std::thread threadInterpreter(&Interpreter::run, &testInterpreter);
-    
-//     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    
-//     testInjector.stop();
-//     testInterpreter.stop();
-    
-//     threadInjector.join();
-//     threadInterpreter.join();
-// }
+//EQ TRUE + FALSE

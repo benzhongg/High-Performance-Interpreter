@@ -5,16 +5,6 @@ add_executable(VirtualMachineTest
     interpreterTest.cpp
 )
 
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/testData.txt"
-    "${CMAKE_CURRENT_BINARY_DIR}/testData.txt"
-    "${CMAKE_CURRENT_BINARY_DIR}/testData.html"
-    "${CMAKE_CURRENT_SOURCE_DIR}/testData.html"
-    "${CMAKE_CURRENT_SOURCE_DIR}/testEmptyData.txt"
-    "${CMAKE_CURRENT_BINARY_DIR}/testEmptyData.txt"
-    COPYONLY
-)
-
 target_link_libraries(VirtualMachineTest PRIVATE 
     LIBRARY 
     GTest::gtest_main

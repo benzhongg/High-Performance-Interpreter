@@ -10,12 +10,29 @@ private:
     class MockInterpreter : public Interpreter
     {
     public:
+        std::string m_output {};
+        
         MockInterpreter(InstructionRingBuffer1KPtr ringBufferPtrInput) : Interpreter(ringBufferPtrInput){};
 
         bool verifyStack(std::uint32_t testValue)
         {
             return m_resultStack.top() == testValue;
         }
+
+        void processInstruction(std::shared_ptr<Instruction::Base> instruction) override
+        {
+            if (instruction->instructType == Instruction::InstructionType::PRINT)
+            {
+                auto resPrint = static_cast<Instruction::Print*>(instruction.get());
+                m_output += resPrint->printStr;
+            }
+            else
+            {
+                Interpreter::processInstruction(instruction);
+            }
+        }
+
+        
     };
 
     std::shared_ptr<FileReaderBase> m_fileReader { nullptr };
@@ -31,6 +48,7 @@ public:
         m_injector = Injector(m_fileReader, m_ringBufferPtr);
     }
     
+    // this function is a sync function
     void run()
     {
         m_injector.runAsync();
@@ -45,6 +63,11 @@ public:
     bool resultCheck(std::uint32_t expectedValue)
     {
         return m_interpreter.verifyStack(expectedValue);
+    }
+
+    bool validateOutput(std::string expected)
+    {
+        return m_interpreter.m_output == expected;
     }
 };
 
@@ -170,8 +193,8 @@ TEST(EQCompareInterpreterTest, withCharBufferFalseOutput)
 
 TEST(PrintInterpreterTest, withCharBuffer)
 {
-    char bufferContainingPrint[] = {0x07, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x68, 0x65, 0x6C, 0x6F, 0x77, 0x6F, 0x72, 0x6C, 0x64};
+    char bufferContainingPrint[] = {0x07, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x77, 0x6F, 0x72, 0x6C, 0x64};
     MockVM testInstance(bufferContainingPrint, 18);
     testInstance.run();
-    SUCCEED();
+    ASSERT_EQ(testInstance.validateOutput("helloworld"), true);
 }

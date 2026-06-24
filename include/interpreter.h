@@ -13,6 +13,7 @@ private:
 protected:
     InstructionRingBuffer1KPtr m_ringBuffer { nullptr };
     std::stack<std::uint32_t> m_resultStack { };
+    virtual void processInstruction(std::shared_ptr<Instruction::Base> instruction);
 
 public:
     Interpreter(InstructionRingBuffer1KPtr ringBuffer);

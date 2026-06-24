@@ -3,25 +3,22 @@
 #include "fileReader.h"
 #include "instruction.h"
 #include "instructionBuilder.h"
-#include <memory>
-#include "global.h"
-#include <thread>
+#include "memory"
 
 class Injector
 {
-private:
-    bool m_running { false };
-    std::thread m_thread;
-
 protected:
-    std::shared_ptr<FileReaderBase> m_fileReader { nullptr };
-    InstructionRingBuffer1KPtr m_ringBuffer { nullptr };
-    std::unique_ptr<InstructionBuilder> m_instructBuilder { nullptr };
+    FileReaderBase* m_fileReader { nullptr };
+    RingBuffer<std::shared_ptr<Instruction::Base>, 1024>* m_ringBuffer { nullptr };
+    InstructionBuilder* m_instructBuilder { nullptr };
 
 public:
-    Injector(std::shared_ptr<FileReaderBase> fileReader, InstructionRingBuffer1KPtr buffer);
+    Injector(FileReaderBase* fileReader, RingBuffer<std::shared_ptr<Instruction::Base>, 1024>* buffer);
     
     virtual void run();
-    virtual void runAsync();
     virtual void stop();
 };
+
+
+
+

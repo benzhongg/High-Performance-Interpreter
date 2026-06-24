@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <filesystem>
 #include <expected>
+#include "stream_utils.h"
 #include <stdexcept>
 
 
@@ -19,8 +20,6 @@ enum ErrorCode
 class FileReaderBase
 {
 public:
-    FileReaderBase() = default;
-
     virtual std::uint32_t get_uint32 (bool* result = nullptr) = 0;
     virtual std::int32_t  get_int32  (bool* result = nullptr) = 0;
     virtual std::uint64_t get_uint64 (bool* result = nullptr) = 0;
@@ -43,7 +42,7 @@ private:
     }
     
     template<typename T>
-    bool getBytes(T& value, size_t length = 0) {
+    bool getBytes(T& value) {
         // QUESTION -> WHY IS THIS ALLOWED?
         if (m_stream.read(reinterpret_cast<char*>(&value), sizeof(T)))
         {
@@ -51,18 +50,6 @@ private:
         }
 
         return false;
-    }
-
-    template<typename T>
-    T returnValue()
-    {
-        T value;
-        auto success = getBytes<T>(value);
-        if (!success)
-        {
-            throw std::runtime_error("Could not open file");
-        }
-        return value;
     }
 
 public:
@@ -85,41 +72,43 @@ public:
 
     std::uint32_t get_uint32 (bool* result = nullptr) override 
     {
-        return returnValue<std::uint32_t>();
+        std::uint32_t value;
+        bool success = getBytes<std::uint32_t>(value);
+        if (!success) 
+        {
+            throw std::runtime_error("Could not open file");
+        }
+        return value;
     }
 
     std::int32_t get_int32 (bool* result = nullptr) override
     {
-        return returnValue<std::int32_t>();
+
     }
 
     std::uint64_t get_uint64 (bool* result = nullptr) override
     {
-        return returnValue<std::uint64_t>();
+
     }
 
     std::int64_t get_int64 (bool* result = nullptr) override
     {
-        return returnValue<std::int64_t>();
+
     }
 
     std::uint8_t get_uint8 (bool* result = nullptr) override
     {
-        return returnValue<std::uint8_t>();
+
     }
 
     std::int8_t get_int8 (bool* result = nullptr) override
     {
-        return returnValue<std::int8_t>();
+
     }
 
     char* get_bytes(size_t size, bool* result = nullptr) override
     {
-        char* res = new char[size];
-        
-        m_stream.read(res, size);
 
-        return res;
     }
 };
 
@@ -165,7 +154,8 @@ private:
     }
 
 public:
-    BufferFileReader(const char* data, size_t size) : FileReaderBase(), m_data(data), m_size(size), m_pos(0){}
+    // straightfoward works for char[] tests
+    BufferFileReader(const char* data, size_t size) : m_data(data), m_size(size), m_pos(0){}
 
     std::uint32_t get_uint32(bool* result = nullptr) override
     {

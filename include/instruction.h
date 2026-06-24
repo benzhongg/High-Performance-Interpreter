@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
-#include "fileReader.h"
 #include <iostream>
 #include <string>
+#include "fileReader.h"
 
 namespace Instruction
 {
@@ -13,9 +13,7 @@ namespace Instruction
         SUB,
         MUL,
         DIV,
-        LOAD,
         STORE,
-        JMP,
         CMP,
         PRINT
     };
@@ -77,14 +75,12 @@ namespace Instruction
     {
         enum CompareOperand
         {
-            Greater,
+            Greater = 1,
             Less,
-            Equal,
             GreaterEqual,
-            LessEqual
+            LessEqual,
+            Equal
         };
-        // how can from CompareOperand::Equal to =
-        // resolve method for this compare
 
         std::uint32_t param1;
         std::uint32_t param2;
